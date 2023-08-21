@@ -30,6 +30,7 @@ const getTodos = async (req, res, next) => {
 
         res.status(200).json({
             status: 'success',
+            count: todos.length,
             data: {
                 todos
             }
@@ -80,4 +81,29 @@ const completeTodo = async (req, res) => {
     }
 }
 
-export { createTodo, getTodos, completeTodo }
+const deleteTodo = async (req, res) => {
+    try {
+        const todo = await Todo.findByIdAndDelete(req.params.id)
+
+        if (!todo) {
+            return res.status(404).json({
+                status: 'fail',
+                message: "Todo not found"
+            })
+        }
+
+        res.status(204).json({
+            status: 'success',
+        })
+
+
+    } catch (err) {
+        console.log('Error💥 ', err)
+        res.status(500).json({
+            status: 'error',
+            message: 'Internal server error'
+        })
+    }
+}
+
+export { createTodo, getTodos, completeTodo, deleteTodo }

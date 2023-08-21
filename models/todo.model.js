@@ -18,10 +18,16 @@ const todoSchema = new mongoose.Schema({
     delayed: {
         type: Boolean,
         default: false
+    },
+
+    description: {
+        type: String
     }
 }, {
+
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
+    timestamps: true
 })
 
 todoSchema.pre(/^find/, function (next) {
