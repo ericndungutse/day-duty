@@ -31,7 +31,7 @@ const todoSchema = new mongoose.Schema({
 })
 
 todoSchema.pre(/^find/, function (next) {
-    this.select("-__v")
+    this.select("-__v -createdAt -updatedAt")
     this.sort('date')
     next()
 })

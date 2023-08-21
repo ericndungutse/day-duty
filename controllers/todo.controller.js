@@ -45,9 +45,11 @@ const getTodos = async (req, res, next) => {
     }
 }
 
-const completeTodo = async (req, res) => {
+const updateTodo = async (req, res) => {
     try {
-        const todo = await Todo.findById(req.params.id)
+        const todo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
+            new: true
+        })
 
         if (!todo) {
             return res.status(404).json({
@@ -56,10 +58,10 @@ const completeTodo = async (req, res) => {
             })
         }
 
-        todo.isComplete = true
-        Date.parse(todo.date) < Date.now() ? todo.delayed = true : todo.delayed = todo.delayed
-
-        await todo.save()
+        if (Date.parse(todo.date) < Date.now()) {
+            todo.delayed = true
+            await todo.save()
+        }
 
         res.status(200).json({
             status: 'success',
@@ -67,6 +69,7 @@ const completeTodo = async (req, res) => {
                 todo: {
                     title: todo.title,
                     date: todo.date,
+                    description: todo.description,
                     isComplete: todo.isComplete,
                     delayed: todo.delayed
                 }
@@ -106,4 +109,5 @@ const deleteTodo = async (req, res) => {
     }
 }
 
-export { createTodo, getTodos, completeTodo, deleteTodo }
+
+export { createTodo, getTodos, deleteTodo, updateTodo }
