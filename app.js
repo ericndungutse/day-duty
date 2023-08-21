@@ -17,7 +17,7 @@ app.use('/api/v1/todos', todoRouter)
 
 app.use('*', (req, res) => {
     console.log(req.baseUrl)
-    res.status(400).json({
+    res.status(404).json({
         status: 'fail',
         message: `Cannot find ${req.baseUrl} on this server.`
     })

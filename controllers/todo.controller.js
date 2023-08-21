@@ -44,6 +44,40 @@ const getTodos = async (req, res, next) => {
     }
 }
 
+const completeTodo = async (req, res) => {
+    try {
+        const todo = await Todo.findById(req.params.id)
 
+        if (!todo) {
+            return res.status(404).json({
+                status: 'fail',
+                message: "Todo not found"
+            })
+        }
 
-export { createTodo, getTodos }
+        todo.isComplete = true
+        Date.parse(todo.date) < Date.now() ? todo.delayed = true : todo.delayed = todo.delayed
+
+        await todo.save()
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                todo: {
+                    title: todo.title,
+                    date: todo.date,
+                    isComplete: todo.isComplete,
+                    delayed: todo.delayed
+                }
+            }
+        })
+    } catch (err) {
+        console.log('Error💥 ', err)
+        res.status(500).json({
+            status: 'error',
+            message: 'Internal server error'
+        })
+    }
+}
+
+export { createTodo, getTodos, completeTodo }

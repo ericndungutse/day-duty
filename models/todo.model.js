@@ -14,6 +14,10 @@ const todoSchema = new mongoose.Schema({
     date: {
         type: Date,
         required: [true, "Enter date of the task"]
+    },
+    delayed: {
+        type: Boolean,
+        default: false
     }
 }, {
     toJSON: { virtuals: true },
