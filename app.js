@@ -1,6 +1,9 @@
 import express from "express"
-import todoRouter from "./routes/todo.routes.js"
 
+import todoRouter from "./routes/todo.routes.js"
+import authRouter from "./routes/auth.routes.js"
+import globalErrHandler from "./controllers/err.controller.js"
+import AppError from "./utils/AppError.js"
 
 const app = express()
 
@@ -14,14 +17,15 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/v1/todos', todoRouter)
+app.use('/api/v1/auth', authRouter)
 
-app.use('*', (req, res) => {
-    console.log(req.baseUrl)
-    res.status(404).json({
-        status: 'fail',
-        message: `Cannot find ${req.baseUrl} on this server.`
-    })
-})
+app.use("*", (req, res, next) => {
+    return next(
+        new AppError(`Cannot find "${req.originalUrl}" on this server`, 404)
+    );
+});
+
+app.use(globalErrHandler);
 
 export default app
 
