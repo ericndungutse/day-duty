@@ -78,10 +78,10 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
-// userSchema.pre(/^find/, function (next) {
-//     this.find({ active: true });
-//     next();
-// });
+userSchema.pre(/^find/, function (next) {
+    this.select("-updatedAt -createdAt")
+    next();
+});
 
 userSchema.methods.comparePasswords = async function (
     candidatePassword,

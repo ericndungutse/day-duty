@@ -35,7 +35,7 @@ export const signup = async (req, res, next) => {
             user.activationToken = hashedToken
             await user.save({ validateModifiedOnly: true });
 
-            const accountActivationLink = `${process.env.BACKEND_URL}/auth/activate-account?token=${activationToken}`;
+            const accountActivationLink = `${process.env.BACKEND_URL}auth/activate-account/${activationToken}/${email}`;
             const message = `Welcome to DayDuty! Clink on this link, ${accountActivationLink} to activate your account. `;
 
             try {
@@ -67,23 +67,54 @@ export const signup = async (req, res, next) => {
     }
 };
 
+// Activate Account
+export const activateAccount = async (req, res, next) => {
+    try {
+        const { email, token } = req.params
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(token)
+            .digest('hex');
+
+
+        const user = await User.findOne({ email, activationToken: hashedToken }).exec()
+
+        if (!user) return res.status(404).json({
+            status: 'fail',
+            message: 'User not found'
+        })
+
+        user.active = true
+        user.activationToken = undefined
+        await user.save({ validateModifiedOnly: true })
+
+        res.status(200).json({
+            status: "success",
+            data: {
+                message: 'Your account was activated successfully! Sign in to get started'
+            }
+        })
+
+    } catch (error) {
+        next(error);
+    }
+}
 
 // Sign in
 export const signin = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
+        if (!email || !password)
+            return next(new AppError("Please provide email and password", 400));
+
         const user = await User.findOne({ email }, "id password email active").exec();
 
         if (user && !user.active)
             return next(new AppError("Your account is not activated! Check your email to activate your", 403));
 
-        if (!email || !password)
-            return next(new AppError("Please provide email and password", 400));
-
         if (!user || !(await user.comparePasswords(password, user.password)))
             return next(new AppError("Email or password is incorrect", 403));
-
 
         // Sign In User
         signInUser(user, 200, res);
