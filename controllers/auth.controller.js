@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { promisify } from "util";
 
 import AppError from '../utils/AppError.js'
 import sendEmail from "../utils/email.js";
@@ -199,6 +200,45 @@ export const forgotPassword = async (req, res, next) => {
         next(error);
     }
 };
+
+// Protect Routes
+export const protect = async (req, res, next) => {
+    try {
+        let token;
+
+        // 1) GET THE TOKEN AND CHECK IF IT EXIST
+        if (
+            req.headers.authorization &&
+            req.headers.authorization.startsWith('Bearer')
+        ) {
+            token = req.headers.authorization.split(' ')[1];
+        }
+
+        if (!token)
+            return next(
+                new AppError('Your are not logged in! Please login to get access.', 401)
+            );
+
+        // 2) VELIFY THE TOKEN (VERIFY AND CHECK TIMESPAN)
+        const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+        // 3) CHECK IF USER STILL EXIST
+        const currentUser = await User.findById({ _id: decoded.userId });
+        if (!currentUser) return next(new AppError('User no longer exists', 401));
+
+        // 4) CHECK USER RECENTLY CHANGED PASSWORD AFTER TOKEN WAS ISSUED
+        if (currentUser.changedPasswordAfter(decoded.iat))
+            return next(
+                new AppError('User recently changed password! Please login again.', 401)
+            );
+
+        // 5) GRANT ACCESS (AUTHORIZE)
+        req.user = currentUser;
+        next();
+    } catch (error) {
+        next(error)
+    }
+}
 
 // Reset Password
 export const resetPassword = async (req, res, next) => {

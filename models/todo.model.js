@@ -22,7 +22,13 @@ const todoSchema = new mongoose.Schema({
 
     description: {
         type: String
-    }
+    },
+
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: [true, 'Review must belong to a user.'],
+    },
 }, {
 
     toJSON: { virtuals: true },

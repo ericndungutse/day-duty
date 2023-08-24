@@ -2,7 +2,8 @@ import Todo from "../models/todo.model.js";
 
 const createTodo = async (req, res, next) => {
     try {
-        const todo = await Todo.create(req.body)
+        const todoBody = { ...req.body, user: req.user.id }
+        const todo = await Todo.create(todoBody)
 
         res.status(201).json({
             status: 'success',
@@ -26,7 +27,7 @@ const createTodo = async (req, res, next) => {
 
 const getTodos = async (req, res, next) => {
     try {
-        const todos = await Todo.find(req.body)
+        const todos = await Todo.find({ user: req.user.id })
 
         res.status(200).json({
             status: 'success',
@@ -47,7 +48,7 @@ const getTodos = async (req, res, next) => {
 
 const updateTodo = async (req, res) => {
     try {
-        const todo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
+        const todo = await Todo.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, req.body, {
             new: true
         })
 
@@ -86,7 +87,7 @@ const updateTodo = async (req, res) => {
 
 const deleteTodo = async (req, res) => {
     try {
-        const todo = await Todo.findByIdAndDelete(req.params.id)
+        const todo = await Todo.findOneAndDelete({ _id: req.params.id, user: req.user.id })
 
         if (!todo) {
             return res.status(404).json({
@@ -98,7 +99,6 @@ const deleteTodo = async (req, res) => {
         res.status(204).json({
             status: 'success',
         })
-
 
     } catch (err) {
         console.log('Error💥 ', err)
