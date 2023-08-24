@@ -279,7 +279,12 @@ export const resetPassword = async (req, res, next) => {
 };
 
 export const logout = (req, res, next) => {
-    return jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, {
         expiresIn: 1000,
+    });
+
+    res.status(200).json({
+        status: "success",
+        token
     });
 }
