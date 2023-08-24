@@ -277,3 +277,9 @@ export const resetPassword = async (req, res, next) => {
         next(error);
     }
 };
+
+export const logout = (req, res, next) => {
+    return jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, {
+        expiresIn: 1000,
+    });
+}
