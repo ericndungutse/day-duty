@@ -1,4 +1,5 @@
 import express from "express"
+import cors from 'cors'
 
 import todoRouter from "./routes/todo.routes.js"
 import authRouter from "./routes/auth.routes.js"
@@ -6,6 +7,7 @@ import globalErrHandler from "./controllers/err.controller.js"
 import AppError from "./utils/AppError.js"
 
 const app = express()
+app.use(cors())
 
 app.use(express.json())
 

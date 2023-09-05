@@ -6,18 +6,15 @@ const todoSchema = new mongoose.Schema({
         required: [true, 'Please provide todo title'],
     },
 
-    isComplete: {
-        type: Boolean,
-        default: false
+    status: {
+        type: String,
+        enum: ['pending', 'completed', 'delayed'],
+        default: 'pending'
     },
 
     date: {
         type: Date,
         required: [true, "Enter date of the task"]
-    },
-    delayed: {
-        type: Boolean,
-        default: false
     },
 
     description: {
