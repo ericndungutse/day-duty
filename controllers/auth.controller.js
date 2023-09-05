@@ -52,6 +52,7 @@ export const signup = async (req, res, next) => {
                     message: "Link to activate your account has been sent! Check your email to activate.",
                 });
             } catch (err) {
+                console.log(err)
                 // DELETE USER IF SENDING EMAIL FAILS
                 await User.findByIdAndDelete(user._id)
                 return next(
