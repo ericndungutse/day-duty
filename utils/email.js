@@ -3,11 +3,10 @@ import nodemailer from "nodemailer"
 const sendEmail = async (options) => {
     // 1) Create a transporter. A service thatsend an email
     const transporter = nodemailer.createTransport({
-        host: process.env.MAILTRAP_HOST,
-        port: process.env.MAILTRAP_PORT,
+        service: process.env.MAIL_PROD_HOST,
         auth: {
-            user: process.env.MAILTRAP_USER,
-            pass: process.env.MAILTRAP_PASSWORD,
+            user: process.env.MAIL_PROD_USER,
+            pass: process.env.MAIL_PROD_PASSWORD,
         },
     });
     // 2) Define email options

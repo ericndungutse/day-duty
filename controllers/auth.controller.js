@@ -36,7 +36,7 @@ export const signup = async (req, res, next) => {
             user.activationToken = hashedToken
             await user.save({ validateModifiedOnly: true });
 
-            const accountActivationLink = `${process.env.BACKEND_URL}auth/activate-account/${activationToken}/${email}`;
+            const accountActivationLink = `${process.env.FRONTEND_URL}activate-account/${activationToken}`;
             const message = `Welcome to DayDuty! Clink on this link, ${accountActivationLink} to activate your account. `;
 
             try {
@@ -46,12 +46,12 @@ export const signup = async (req, res, next) => {
                     message,
                 });
 
+
                 res.status(201).json({
                     status: "success",
                     message: "Link to activate your account has been sent! Check your email to activate.",
                 });
             } catch (err) {
-
                 // DELETE USER IF SENDING EMAIL FAILS
                 await User.findByIdAndDelete(user._id)
                 return next(
@@ -71,14 +71,14 @@ export const signup = async (req, res, next) => {
 // Activate Account
 export const activateAccount = async (req, res, next) => {
     try {
-        const { email, token } = req.params
+        const { token } = req.params
         const hashedToken = crypto
             .createHash('sha256')
             .update(token)
             .digest('hex');
 
 
-        const user = await User.findOne({ email, activationToken: hashedToken }).exec()
+        const user = await User.findOne({ activationToken: hashedToken }).exec()
 
         if (!user) return res.status(404).json({
             status: 'fail',
@@ -109,7 +109,7 @@ export const signin = async (req, res, next) => {
         if (!email || !password)
             return next(new AppError("Please provide email and password", 400));
 
-        const user = await User.findOne({ email }, "id password email active").exec();
+        const user = await User.findOne({ email }).exec();
 
         if (user && !user.active)
             return next(new AppError("Your account is not activated! Check your email to activate your", 403));

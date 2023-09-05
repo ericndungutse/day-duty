@@ -9,13 +9,15 @@ const todoSchema = new mongoose.Schema({
     status: {
         type: String,
         enum: ['pending', 'completed', 'delayed'],
-        default: 'pending'
+        default: 'pending',
     },
 
     date: {
         type: Date,
         required: [true, "Enter date of the task"]
     },
+
+    dateCompleted: Date,
 
     description: {
         type: String
@@ -26,6 +28,7 @@ const todoSchema = new mongoose.Schema({
         ref: 'User',
         required: [true, 'Review must belong to a user.'],
     },
+
 }, {
 
     toJSON: { virtuals: true },
